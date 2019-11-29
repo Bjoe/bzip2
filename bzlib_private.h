@@ -8,8 +8,8 @@
    This file is part of bzip2/libbzip2, a program and library for
    lossless, block-sorting data compression.
 
-   bzip2/libbzip2 version 1.0.6 of 6 September 2010
-   Copyright (C) 1996-2010 Julian Seward <jseward@bzip.org>
+   bzip2/libbzip2 version 1.0.8 of 13 July 2019
+   Copyright (C) 1996-2019 Julian Seward <jseward@acm.org>
 
    Please read the WARNING, DISCLAIMER and PATENTS sections in the 
    README file.
@@ -24,9 +24,11 @@
 
 #include <stdlib.h>
 
+#ifndef BZ_NO_STDIO
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#endif
 
 #include "bzlib.h"
 
@@ -34,7 +36,7 @@
 
 /*-- General stuff. --*/
 
-#define BZ_VERSION  "1.0.6, 6-Sept-2010"
+#define BZ_VERSION  "1.0.8, 13-Jul-2019"
 
 typedef char            Char;
 typedef unsigned char   Bool;
@@ -50,6 +52,8 @@ typedef unsigned short  UInt16;
 #ifndef __GNUC__
 #define __inline__  /* */
 #endif 
+
+#ifndef BZ_NO_STDIO
 
 extern void BZ2_bz__AssertH__fail ( int errcode );
 #define AssertH(cond,errcode) \
@@ -78,6 +82,22 @@ extern void BZ2_bz__AssertH__fail ( int errcode );
    fprintf(stderr,zf,za1,za2,za3,za4)
 #define VPrintf5(zf,za1,za2,za3,za4,za5) \
    fprintf(stderr,zf,za1,za2,za3,za4,za5)
+
+#else
+
+extern void bz_internal_error ( int errcode );
+#define AssertH(cond,errcode) \
+   { if (!(cond)) bz_internal_error ( errcode ); }
+#define AssertD(cond,msg)                do { } while (0)
+#define VPrintf0(zf)                     do { } while (0)
+#define VPrintf1(zf,za1)                 do { } while (0)
+#define VPrintf2(zf,za1,za2)             do { } while (0)
+#define VPrintf3(zf,za1,za2,za3)         do { } while (0)
+#define VPrintf4(zf,za1,za2,za3,za4)     do { } while (0)
+#define VPrintf5(zf,za1,za2,za3,za4,za5) do { } while (0)
+
+#endif
+
 
 #define BZALLOC(nnn) (strm->bzalloc)(strm->opaque,(nnn),1)
 #define BZFREE(ppp)  (strm->bzfree)(strm->opaque,(ppp))
@@ -473,6 +493,16 @@ BZ2_hbCreateDecodeTables ( Int32*, Int32*, Int32*, UChar*,
 
 
 #endif
+
+
+/*-- BZ_NO_STDIO seems to make NULL disappear on some platforms. --*/
+
+#ifdef BZ_NO_STDIO
+#ifndef NULL
+#define NULL 0
+#endif
+#endif
+
 
 /*-------------------------------------------------------------*/
 /*--- end                                   bzlib_private.h ---*/

@@ -13,8 +13,8 @@
    This file is part of bzip2/libbzip2, a program and library for
    lossless, block-sorting data compression.
 
-   bzip2/libbzip2 version 1.0.6 of 6 September 2010
-   Copyright (C) 1996-2010 Julian Seward <jseward@bzip.org>
+   bzip2/libbzip2 version 1.0.8 of 13 July 2019
+   Copyright (C) 1996-2019 Julian Seward <jseward@acm.org>
 
    Please read the WARNING, DISCLAIMER and PATENTS sections in the 
    README file.
@@ -26,17 +26,8 @@
 
 #define _FILE_OFFSET_BITS 64
 
-
 #include <stdio.h>
 #include <stdlib.h>
-
-#if defined(_WIN32)
-#   include <fcntl.h>
-#   include <io.h>
-#   define SET_BINARY_MODE(file) setmode(fileno(file),O_BINARY)
-#else
-#   define SET_BINARY_MODE(file)
-#endif 
 
 /* The number of megabytes of junk to spew out (roughly) */
 #define MEGABYTES 5000
@@ -47,11 +38,10 @@ char buf[N_BUF];
 int main ( int argc, char** argv )
 {
    int ii, kk, p;
-   srand(1);
-   SET_BINARY_MODE(stdout);
-   setvbuf ( stdout, buf, _IOFBF, N_BUF );
+   srandom(1);
+   setbuffer ( stdout, buf, N_BUF );
    for (kk = 0; kk < MEGABYTES * 515; kk+=3) {
-      p = 25+rand()%50;
+      p = 25+random()%50;
       for (ii = 0; ii < p; ii++)
          printf ( "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" );
       for (ii = 0; ii < p-1; ii++)
